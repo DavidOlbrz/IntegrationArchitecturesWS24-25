@@ -5,7 +5,13 @@ import org.bson.Document;
 public class SalesMan {
     private String firstname;
     private String lastname;
-    private Integer sid;
+    private Integer sid; // Id of the SalesMan
+
+    /**
+     * @param firstname Fristname of SalesMan
+     * @param lastname  Lastname of SalesMan
+     * @param sid       ID of SalesMan
+     */
 
     public SalesMan(String firstname, String lastname, Integer sid) {
         this.firstname = firstname;
@@ -39,9 +45,9 @@ public class SalesMan {
 
     public Document toDocument() {
         org.bson.Document document = new Document();
-        document.append("firstname" , this.firstname );
-        document.append("lastname" , this.lastname );
-        document.append("sid" , this.sid);
+        document.append("firstname", this.firstname);
+        document.append("lastname", this.lastname);
+        document.append("sid", this.sid);
         return document;
     }
 }
