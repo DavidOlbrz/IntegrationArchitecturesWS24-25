@@ -2,12 +2,10 @@ package com.hbrs;
 
 
 import com.mongodb.client.*;
-import com.mongodb.client.model.Projections;
 import de.hbrs.ia.code.ManagePersonal;
 import de.hbrs.ia.model.SalesMan;
 import de.hbrs.ia.model.SocialPerformanceRecord;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;

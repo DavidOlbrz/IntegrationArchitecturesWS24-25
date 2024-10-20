@@ -205,7 +205,6 @@ class HighPerformanceTest {
         management.addSocialPerformanceRecord(record4, salesMan2);
         management.addSocialPerformanceRecord(record5, salesMan2);
 
-        List<SocialPerformanceRecord> result = management.readSocialPerformanceRecord(salesMan1);
         List<Integer> resultIDs = new ArrayList<>();
 
         List<Integer> years = new ArrayList<>();
