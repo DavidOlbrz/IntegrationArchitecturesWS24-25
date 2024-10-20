@@ -1,17 +1,19 @@
 package test;
 
 import com.hbrs.Main;
-import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import de.hbrs.ia.model.SalesMan;
 import de.hbrs.ia.model.SocialPerformanceRecord;
 import org.bson.Document;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.eq;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HighPerformanceTest {
@@ -19,8 +21,6 @@ class HighPerformanceTest {
     private final String DB_USER = System.getenv("DB_USER");
     private final String DB_PASS = System.getenv("DB_PASS");
 
-    //private MongoClient client;
-    //private MongoDatabase supermongo;
     private MongoCollection<Document> salesmen;
     private MongoCollection<Document> reports;
     private Main management;
@@ -32,21 +32,17 @@ class HighPerformanceTest {
      */
     @BeforeEach
     void setUp() {
-        // Setting up the connection to a local MongoDB with standard port 27017
-        // must be started within a terminal with command 'mongod'.
-        //client = new MongoClient("localhost", 27017);
-
         Main.connectDB();
-
-        // Get database 'highperformance' (creates one if not available)
-        //supermongo = client.getDatabase("highperformanceNewTest");
 
         salesmen = Main.salesmenDB;
         reports = Main.reportsDB;
         management = new Main();
+    }
 
-        // Get Collection 'salesmen' (creates one if not available)
-        //salesmen = supermongo.getCollection("salesmen");
+    @AfterEach
+    void tearDown() {
+        salesmen.drop();
+        reports.drop();
     }
 
     @Test
@@ -65,11 +61,9 @@ class HighPerformanceTest {
         System.out.println("Printing the object (JSON): " + newDocument);
 
         // Assertion
+        assert newDocument != null;
         Integer sid = (Integer) newDocument.get("sid");
         assertEquals(90133, sid);
-
-        // Deletion
-        salesmen.drop();
     }
 
     @Test
@@ -87,6 +81,7 @@ class HighPerformanceTest {
         System.out.println("Printing the object (JSON): " + newDocument);
 
         // Assertion
+        assert newDocument != null;
         Integer sid = (Integer) newDocument.get("sid");
         assertEquals(90444, sid);
 
@@ -103,11 +98,10 @@ class HighPerformanceTest {
         // check correctness
         Document lastDocument = salesmen.find().first();
         System.out.println("Salesman: " + lastDocument);
+        assert lastDocument != null;
         assertEquals(3947, (Integer) lastDocument.get("sid"), "Salesman ID wrong");
         assertEquals("Random", lastDocument.get("firstname"), "Salesman first name wrong");
         assertEquals("Person", lastDocument.get("lastname"), "Salesman last name wrong");
-        // cleanup
-        salesmen.drop();
     }
 
     @Test
@@ -115,7 +109,7 @@ class HighPerformanceTest {
         // create salesman
         SalesMan salesman = new SalesMan("Random", "Person", 3947);
         // create report for Salesman
-        SocialPerformanceRecord record = new SocialPerformanceRecord(salesman, 1000, 0,
+        SocialPerformanceRecord record = new SocialPerformanceRecord(1000, 0,
                 0, 0, 0, 0, 0);
 
         // add salesman and report to database
@@ -123,19 +117,17 @@ class HighPerformanceTest {
         management.addSocialPerformanceRecord(record, salesman);
 
         // check for correctness
-        Document lastDocument = salesmen.find().first();
+        Document lastDocument = reports.find().first();
         System.out.println("Record: " + lastDocument);
-        assertEquals(salesman, (SalesMan) lastDocument.get("salesMan"), "Wrong Salesman");
+        assert lastDocument != null;
+        assertEquals(3947, lastDocument.getInteger("SID"), "Wrong Salesman");
         assertEquals(1000, (Integer) lastDocument.get("year"), "Wrong year");
         assertEquals(0, (Integer) lastDocument.get("leaderShipCompetence"), "Wrong leadership competence");
-        assertEquals(0, (Integer) lastDocument.get("openessToEmployee"), "Wrong openess");
+        assertEquals(0, (Integer) lastDocument.get("opennessToEmployee"), "Wrong openess");
         assertEquals(0, (Integer) lastDocument.get("socialBehaviourToEmployee"), "Wrong behaviour");
-        assertEquals(0, (Integer) lastDocument.get("attiudeTowardsClient"), "Wrong attidue");
+        assertEquals(0, (Integer) lastDocument.get("attitudeTowardsClient"), "Wrong attidue");
         assertEquals(0, (Integer) lastDocument.get("communicationSkills"), "Wrong skills");
         assertEquals(0, (Integer) lastDocument.get("integrityToCompany"), "Wrong integrity");
-
-        //cleanup
-        salesmen.drop();
     }
 
     @Test
@@ -149,8 +141,6 @@ class HighPerformanceTest {
         assertEquals(3947, result.getId(), "Salesman ID wrong");
         assertEquals("Random", result.getFirstname(), "Salesman first name wrong");
         assertEquals("Person", result.getLastname(), "Salesman last name wrong");
-        // cleanup
-        salesmen.drop();
     }
 
     @Test
@@ -161,25 +151,74 @@ class HighPerformanceTest {
         SalesMan salesMan4 = new SalesMan("Jan", "Kaupp", 1000);
         SalesMan salesMan5 = new SalesMan("David", "Olbertz", 5879);
 
+        List<Integer> IDs = new ArrayList<>();
+        IDs.add(salesMan1.getId());
+        IDs.add(salesMan2.getId());
+        IDs.add(salesMan3.getId());
+        IDs.add(salesMan4.getId());
+        IDs.add(salesMan5.getId());
+
         salesmen.insertOne(salesMan1.toDocument());
         salesmen.insertOne(salesMan2.toDocument());
         salesmen.insertOne(salesMan3.toDocument());
         salesmen.insertOne(salesMan4.toDocument());
         salesmen.insertOne(salesMan5.toDocument());
 
-        ArrayList<SalesMan> salesManArrayList = new ArrayList<>();
-        salesManArrayList.add(salesMan1);
-        salesManArrayList.add(salesMan2);
-        salesManArrayList.add(salesMan3);
-        salesManArrayList.add(salesMan4);
-        salesManArrayList.add(salesMan5);
+        List<SalesMan> results = management.readAllSalesMen();
+        List<Integer> resultIDs = new ArrayList<>();
 
-        //assertArrayEquals(salesManArrayList, management.readAllSalesMen());
+        for (SalesMan salesMan : results) {
+            resultIDs.add(salesMan.getId());
+        }
+
+        assertTrue(resultIDs.containsAll(IDs));
     }
 
     @Test
     void readSocialPerformanceRecordTest() {
+        //create a Stupa Salesman
+        SalesMan salesMan1 = new SalesMan("Kai", "Bühner", 1004);
+        SalesMan salesMan2 = new SalesMan("Stephan", "Schwabenman", 1004);
 
+
+        // create performance records for the Stupa Salesman
+        SocialPerformanceRecord record1 = new SocialPerformanceRecord(2024, 2,
+                3, 4, 5, 1, 5);
+        SocialPerformanceRecord record2 = new SocialPerformanceRecord(2023, 1,
+                2, 3, 4, 5, 6);
+        SocialPerformanceRecord record3 = new SocialPerformanceRecord(2022, 2,
+                3, 4, 2, 1, 3);
+
+        SocialPerformanceRecord record4 = new SocialPerformanceRecord(2021, 5,
+                4, 5, 6, 2, 6);
+        SocialPerformanceRecord record5 = new SocialPerformanceRecord(2020, 1,
+                3, 7, 7, 2, 1);
+
+        // adding the stupasalesmen to the database
+        salesmen.insertOne(salesMan1.toDocument());
+        salesmen.insertOne(salesMan2.toDocument());
+        // adding performance records to database and assigning them to the stupa salesman
+        management.addSocialPerformanceRecord(record1, salesMan1);
+        management.addSocialPerformanceRecord(record2, salesMan1);
+        management.addSocialPerformanceRecord(record3, salesMan1);
+
+        management.addSocialPerformanceRecord(record4, salesMan2);
+        management.addSocialPerformanceRecord(record5, salesMan2);
+
+        List<SocialPerformanceRecord> result = management.readSocialPerformanceRecord(salesMan1);
+        List<Integer> resultIDs = new ArrayList<>();
+
+        List<Integer> years = new ArrayList<>();
+        years.add(2022);
+        years.add(2023);
+        years.add(2024);
+
+        resultIDs.add(record1.getYear());
+        resultIDs.add(record2.getYear());
+        resultIDs.add(record3.getYear());
+
+        assertTrue(resultIDs.containsAll(years));
+        assertFalse(resultIDs.contains(2020) || resultIDs.contains(2021));
     }
 
     @Test
@@ -195,7 +234,22 @@ class HighPerformanceTest {
 
     @Test
     void deleteSocialPerformanceRecord() {
-
+        // create example salesman & record
+        SalesMan salesman = new SalesMan("Random", "Person", 3947);
+        SocialPerformanceRecord record = new SocialPerformanceRecord(1000, 0,
+                0, 0, 0, 0, 0);
+        // add salesman to database
+        salesmen.insertOne(salesman.toDocument());
+        management.addSocialPerformanceRecord(record, salesman);
+        // check correctness
+        management.deleteSocialPerformanceRecord(salesman, 1000);
+        assertNull(
+                reports.find(and(
+                        eq("SID", salesman.getId()),
+                        eq("year", record.getYear())
+                )).first(),
+                "Social Performance Record is still present inside database"
+        );
     }
 
 }

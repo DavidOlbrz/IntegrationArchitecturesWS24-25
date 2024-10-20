@@ -56,7 +56,7 @@ public class Main implements ManagePersonal {
      */
     @Override
     public void addSocialPerformanceRecord(SocialPerformanceRecord record, SalesMan salesMan) {
-        reportsDB.insertOne(record.toDocument());
+        reportsDB.insertOne(record.toDocument().append("SID", salesMan.getId()));
     }
 
     /**
@@ -65,8 +65,7 @@ public class Main implements ManagePersonal {
      */
     @Override
     public SalesMan readSalesMan(int sid) {
-        Bson projection = Projections.fields(Projections.include("*"));
-        Document doc = salesmenDB.find(eq("sid", sid)).projection(projection).first();
+        Document doc = salesmenDB.find(eq("sid", sid)).first();
 
         assert doc != null;
 
@@ -106,17 +105,16 @@ public class Main implements ManagePersonal {
     public List<SocialPerformanceRecord> readSocialPerformanceRecord(SalesMan salesMan) {
         List<SocialPerformanceRecord> databases = new ArrayList<>();
 
-        FindIterable<Document> list = reportsDB.find();
+        FindIterable<Document> list = reportsDB.find(eq("SID", salesMan.getId()));
 
         for (Document document : list) {
             SocialPerformanceRecord spr = new SocialPerformanceRecord(
-                    document.get("salesMan", SalesMan.class),
                     document.getInteger("year"),
-                    document.getInteger("ledershipCompetence"),
+                    document.getInteger("leaderShipCompetence"),
                     document.getInteger("opennessToEmployee"),
                     document.getInteger("socialBehaviourToEmployee"),
                     document.getInteger("attitudeTowardsClient"),
-                    document.getInteger("communicationsSkill"),
+                    document.getInteger("communicationSkills"),
                     document.getInteger("integrityToCompany")
             );
 
@@ -138,7 +136,7 @@ public class Main implements ManagePersonal {
 
     @Override
     public void deleteSocialPerformanceRecord(SalesMan salesMan, int year) {
-        reportsDB.deleteOne(and(eq("salesMan", salesMan), eq("year", year)));
+        reportsDB.deleteOne(and(eq("SID", salesMan.getId()), eq("year", year)));
     }
 
 }

@@ -4,7 +4,7 @@ import org.bson.Document;
 
 public class SocialPerformanceRecord {
 
-    private SalesMan salesMan;
+    //   private SalesMan salesMan;
     private Integer year; //Year of the Report
 
     private Integer leaderShipCompetence;
@@ -15,7 +15,6 @@ public class SocialPerformanceRecord {
     private Integer integrityToCompany;
 
     /**
-     * @param salesMan                  SalesMan of the SozialPerformanceRecord
      * @param year                      Year of SozialPerformanceRecord of the SalesMan
      * @param leaderShipCompetence      Leader Ship Competencein which a SalesMan efficiently leads and influences his team to achieve the company's goals.
      * @param opennessToEmployee        Openness a Salesman shows to his Employees and fellow Co-Workers
@@ -24,12 +23,12 @@ public class SocialPerformanceRecord {
      * @param communicationSkills       The grade of skills and talents which the salesman displays during social encaunters
      * @param integrityToCompany        Represents the integrity loyalty and intrest the salesman has in regards towards the company
      */
-    public SocialPerformanceRecord(SalesMan salesMan, Integer year, Integer leaderShipCompetence, Integer opennessToEmployee,
+    public SocialPerformanceRecord(Integer year, Integer leaderShipCompetence, Integer opennessToEmployee,
                                    Integer socialBehaviourToEmployee, Integer attitudeTowardsClient,
                                    Integer communicationSkills, Integer integrityToCompany
     ) {
 
-        this.salesMan = salesMan;
+        //  this.salesMan = salesMan;
         this.year = year;
 
         this.leaderShipCompetence = leaderShipCompetence;
@@ -38,15 +37,6 @@ public class SocialPerformanceRecord {
         this.attitudeTowardsClient = attitudeTowardsClient;
         this.communicationSkills = communicationSkills;
         this.integrityToCompany = integrityToCompany;
-    }
-
-
-    public SalesMan getSalesMan() {
-        return salesMan;
-    }
-
-    public void setSalesMan(SalesMan salesMan) {
-        this.salesMan = salesMan;
     }
 
     public Integer getYear() {
@@ -108,13 +98,13 @@ public class SocialPerformanceRecord {
 
     public Document toDocument() {
         org.bson.Document document = new Document();
-        document.append("salesMan", this.salesMan);
+        //document.append("salesMan", this.salesMan);
         document.append("year", this.year);
-        document.append("ledershipCompetence", this.leaderShipCompetence);
+        document.append("leaderShipCompetence", this.leaderShipCompetence);
         document.append("opennessToEmployee", this.opennessToEmployee);
         document.append("socialBehaviourToEmployee", this.socialBehaviourToEmployee);
         document.append("attitudeTowardsClient", this.attitudeTowardsClient);
-        document.append("communicationsSkill", this.communicationSkills);
+        document.append("communicationSkills", this.communicationSkills);
         document.append("integrityToCompany", this.integrityToCompany);
         return document;
     }
