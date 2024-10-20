@@ -1,6 +1,6 @@
 package test;
 
-import com.hbrs.Main;
+import de.hbrs.ia.code.Manage;
 import com.mongodb.client.MongoCollection;
 import de.hbrs.ia.model.SalesMan;
 import de.hbrs.ia.model.SocialPerformanceRecord;
@@ -23,7 +23,7 @@ class HighPerformanceTest {
 
     private MongoCollection<Document> salesmen;
     private MongoCollection<Document> reports;
-    private Main management;
+    private Manage management;
 
     /**
      * Attention: You might update the version of the Driver
@@ -32,11 +32,11 @@ class HighPerformanceTest {
      */
     @BeforeEach
     void setUp() {
-        Main.connectDB();
+        Manage.connectDB();
 
-        salesmen = Main.salesmenDB;
-        reports = Main.reportsDB;
-        management = new Main();
+        salesmen = Manage.salesmenDB;
+        reports = Manage.reportsDB;
+        management = new Manage();
     }
 
     @AfterEach

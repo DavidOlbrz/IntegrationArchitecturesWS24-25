@@ -1,8 +1,7 @@
-package com.hbrs;
+package de.hbrs.ia.code;
 
 
 import com.mongodb.client.*;
-import de.hbrs.ia.code.ManagePersonal;
 import de.hbrs.ia.model.SalesMan;
 import de.hbrs.ia.model.SocialPerformanceRecord;
 import org.bson.Document;
@@ -13,7 +12,7 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 
-public class Main implements ManagePersonal {
+public class Manage implements ManagePersonal {
     // login details via env (Run Configurations -> Edit -> Environment variables)
     public static final String DB_USER = System.getenv("DB_USER");
     public static final String DB_PASS = System.getenv("DB_PASS");
